@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Catálogo — TechStore{% endblock %}
+{% block extra_css %}
+<style>
+  .catalog-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:1.5rem; flex-wrap:wrap; gap:1rem; }
+  .search-bar { display:flex; gap:.5rem; }
+  .search-bar input { width:220px; padding:.55rem .9rem; }
+  .search-bar button { padding:.55rem 1rem; }
+  .filter-bar { display:flex; gap:.5rem; flex-wrap:wrap; margin-bottom:1.5rem; }
+  .filter-pill {
+    padding:.3rem .9rem; border-radius:999px; font-size:.82rem; text-decoration:none;
+    border:1px solid var(--border); color:var(--text2); transition:all .2s;
+  }
+  .filter-pill:hover, .filter-pill.active { background:var(--accent); border-color:var(--accent); color:#fff; }
+  .no-results { text-align:center; padding:4rem; color:var(--text3); }
+</style>
+{% endblock %}
+{% block content %}
+<div class="catalog-header">
+  <h1 class="section-title" style="margin-bottom:0">Catálogo <span>·</span></h1>
+  <form class="search-bar" method="GET" action="/catalogo">
+    <input type="text" name="q" value="{{ busqueda }}" placeholder="Buscar productos...">
+    {% if categoria_actual %}
+      <input type="hidden" name="categoria" value="{{ categoria_actual }}">
+    {% endif %}
+    <button type="submit" class="btn-primary">Buscar</button>
+  </form>
+</div>
+
+<div class="filter-bar">
+  <a href="/catalogo" class="filter-pill {% if not categoria_actual %}active{% endif %}">Todos</a>
+  {% for c in categorias %}
+    <a href="/catalogo?categoria={{ c }}" class="filter-pill {% if c == categoria_actual %}active{% endif %}">{{ c }}</a>
+  {% endfor %}
+</div>
+
+{% if productos %}
+<div class="product-grid">
+  {% for p in productos %}
+  <a href="/producto/{{ p.id }}" style="text-decoration:none">
+    <div class="product-card">
+      <img src="{{ p.imagen_url or 'https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=400' }}" alt="{{ p.nombre }}" loading="lazy"/>
+      <div class="card-body">
+        <div class="category-tag">{{ p.categoria }}</div>
+        <h3>{{ p.nombre }}</h3>
+        <div class="price">S/ {{ "%.2f"|format(p.precio) }}</div>
+        <form action="/carrito/agregar/{{ p.id }}" method="POST" onclick="event.stopPropagation()">
+          <button type="submit" class="btn-primary" style="width:100%;justify-content:center">+ Agregar</button>
+        </form>
+      </div>
+    </div>
+  </a>
+  {% endfor %}
+</div>
+{% else %}
+<div class="no-results">
+  <p style="font-size:2rem">🔍</p>
+  <p>No se encontraron productos.</p>
+  <a href="/catalogo" class="btn-outline" style="margin-top:1rem;display:inline-block">Ver todos</a>
+</div>
+{% endif %}
+{% endblock %}

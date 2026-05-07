@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Mis pedidos — TechStore{% endblock %}
+{% block content %}
+<h1 class="section-title">Mis pedidos <span>·</span></h1>
+{% if pedidos %}
+<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden">
+  <table>
+    <thead>
+      <tr>
+        <th># Pedido</th>
+        <th>Fecha</th>
+        <th>Productos</th>
+        <th>Total</th>
+        <th>Estado</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in pedidos %}
+      <tr>
+        <td><strong>#{{ p.id }}</strong></td>
+        <td>{{ p.creado_en.strftime('%d/%m/%Y %H:%M') }}</td>
+        <td>
+          {% for item in p.items %}
+            <span style="font-size:.82rem;color:var(--text2)">{{ item.producto.nombre }} (×{{ item.cantidad }})</span>{% if not loop.last %}<br>{% endif %}
+          {% endfor %}
+        </td>
+        <td><strong>S/ {{ "%.2f"|format(p.total) }}</strong></td>
+        <td>
+          <span class="badge badge-success">{{ p.estado }}</span>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div style="text-align:center;padding:4rem;color:var(--text3)">
+  <p style="font-size:2.5rem">📦</p>
+  <p>Aún no tienes pedidos.</p>
+  <a href="/catalogo" class="btn-primary" style="margin-top:1rem;display:inline-flex">Ir al catálogo</a>
+</div>
+{% endif %}
+{% endblock %}

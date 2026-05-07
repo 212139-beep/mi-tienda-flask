@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Carrito — TechStore{% endblock %}
+{% block extra_css %}
+<style>
+  .cart-layout { display:grid; grid-template-columns:1fr 340px; gap:2rem; align-items:start; }
+  @media(max-width:800px){ .cart-layout { grid-template-columns:1fr; } }
+  .cart-box, .summary-box {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:var(--radius-lg); overflow:hidden;
+  }
+  .box-header { padding:1.1rem 1.5rem; border-bottom:1px solid var(--border); }
+  .box-header h2 { font-family:'Syne',sans-serif; font-size:1.1rem; font-weight:700; }
+  .cart-item { display:flex; align-items:center; gap:1rem; padding:1rem 1.5rem; border-bottom:1px solid var(--border); }
+  .cart-item:last-child { border-bottom:none; }
+  .cart-item img { width:64px; height:64px; object-fit:cover; border-radius:8px; flex-shrink:0; background:var(--surface2); }
+  .item-info { flex:1; }
+  .item-info .name { font-weight:600; font-size:.92rem; color:var(--text); margin-bottom:.2rem; }
+  .item-info .unit { color:var(--text3); font-size:.8rem; }
+  .item-qty { color:var(--text2); font-size:.88rem; white-space:nowrap; }
+  .item-sub { font-weight:700; color:var(--text); white-space:nowrap; }
+  .item-remove form button { background:none; border:none; color:var(--text3); cursor:pointer; font-size:1rem; padding:.2rem; }
+  .item-remove form button:hover { color:var(--danger); }
+
+  .summary-box { padding:1.5rem; }
+  .summary-box h2 { font-family:'Syne',sans-serif; font-size:1.1rem; font-weight:700; margin-bottom:1.2rem; }
+  .summary-row { display:flex; justify-content:space-between; color:var(--text2); font-size:.9rem; margin-bottom:.7rem; }
+  .summary-total { display:flex; justify-content:space-between; font-size:1.2rem; font-weight:800; color:var(--text); border-top:1px solid var(--border); padding-top:1rem; margin-top:.5rem; margin-bottom:1.25rem; }
+  .empty-cart { text-align:center; padding:4rem 2rem; color:var(--text3); }
+</style>
+{% endblock %}
+{% block content %}
+<h1 class="section-title">Carrito <span>·</span></h1>
+
+{% if items %}
+<div class="cart-layout">
+  <div class="cart-box">
+    <div class="box-header">
+      <h2>{{ items|length }} producto(s)</h2>
+    </div>
+    {% for item in items %}
+    <div class="cart-item">
+      <img src="{{ item.producto.imagen_url or 'https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=100' }}" alt="{{ item.producto.nombre }}"/>
+      <div class="item-info">
+        <div class="name">{{ item.producto.nombre }}</div>
+        <div class="unit">S/ {{ "%.2f"|format(item.producto.precio) }} c/u</div>
+      </div>
+      <span class="item-qty">× {{ item.cantidad }}</span>
+      <span class="item-sub">S/ {{ "%.2f"|format(item.subtotal) }}</span>
+      <div class="item-remove">
+        <form action="/carrito/quitar/{{ item.producto.id }}" method="POST">
+          <button type="submit" title="Quitar uno">✕</button>
+        </form>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="summary-box">
+    <h2>Resumen</h2>
+    <div class="summary-row"><span>Subtotal</span><span>S/ {{ "%.2f"|format(total) }}</span></div>
+    <div class="summary-row"><span>Envío</span><span style="color:var(--success)">Gratis</span></div>
+    <div class="summary-total"><span>Total</span><span>S/ {{ "%.2f"|format(total) }}</span></div>
+    <a href="/checkout" class="btn-primary" style="width:100%;justify-content:center;padding:.8rem">Proceder al pago →</a>
+    <form action="/carrito/vaciar" method="POST" style="margin-top:.75rem">
+      <button type="submit" class="btn-outline" style="width:100%;justify-content:center">Vaciar carrito</button>
+    </form>
+  </div>
+</div>
+{% else %}
+<div class="empty-cart">
+  <p style="font-size:3rem">🛒</p>
+  <p style="margin-top:.5rem">Tu carrito está vacío</p>
+  <a href="/catalogo" class="btn-primary" style="margin-top:1.25rem;display:inline-flex">Ver productos</a>
+</div>
+{% endif %}
+{% endblock %}

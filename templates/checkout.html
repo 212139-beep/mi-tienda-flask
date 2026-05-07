@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Checkout — TechStore{% endblock %}
+{% block extra_css %}
+<style>
+  .checkout-layout { display:grid; grid-template-columns:1fr 320px; gap:2rem; align-items:start; }
+  @media(max-width:750px){ .checkout-layout { grid-template-columns:1fr; } }
+  .checkout-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:1.75rem; }
+  .checkout-card h2 { font-family:'Syne',sans-serif; font-size:1.1rem; font-weight:700; margin-bottom:1.25rem; }
+  .order-item { display:flex; justify-content:space-between; align-items:center; padding:.6rem 0; border-bottom:1px solid var(--border); font-size:.88rem; }
+  .order-item:last-child { border-bottom:none; }
+  .order-item .name { color:var(--text); font-weight:500; }
+  .order-item .qty { color:var(--text3); margin-left:.5rem; }
+  .order-item .sub { color:var(--text); font-weight:700; }
+  .total-row { display:flex; justify-content:space-between; font-size:1.1rem; font-weight:800; color:var(--text); border-top:1px solid var(--border); padding-top:1rem; margin-top:.5rem; }
+  .info-field { background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius); padding:.7rem 1rem; color:var(--text2); font-size:.9rem; margin-bottom:.75rem; }
+  .nota { font-size:.78rem; color:var(--text3); margin-top:.4rem; }
+</style>
+{% endblock %}
+{% block content %}
+<h1 class="section-title">Checkout <span>·</span></h1>
+<div class="checkout-layout">
+  <div>
+    <div class="checkout-card" style="margin-bottom:1.25rem">
+      <h2>Datos de entrega</h2>
+      <div class="info-field">{{ usuario.nombre }}</div>
+      <div class="info-field">{{ usuario.email }}</div>
+      <div class="info-field" style="cursor:text">Dirección de entrega — Lima, Perú</div>
+      <p class="nota">* En esta versión demo la dirección es informativa.</p>
+    </div>
+    <div class="checkout-card">
+      <h2>Método de pago</h2>
+      <div class="info-field">💳 Tarjeta terminada en **** 4242</div>
+      <p class="nota">* Pago simulado — no se realiza cobro real.</p>
+    </div>
+  </div>
+
+  <div class="checkout-card">
+    <h2>Resumen del pedido</h2>
+    {% for item in items %}
+    <div class="order-item">
+      <span class="name">{{ item.producto.nombre }}<span class="qty">× {{ item.cantidad }}</span></span>
+      <span class="sub">S/ {{ "%.2f"|format(item.subtotal) }}</span>
+    </div>
+    {% endfor %}
+    <div class="total-row"><span>Total</span><span>S/ {{ "%.2f"|format(total) }}</span></div>
+    <form method="POST" action="/checkout" style="margin-top:1.25rem">
+      <button type="submit" class="btn-primary" style="width:100%;justify-content:center;padding:.85rem;font-size:1rem">
+        ✓ Confirmar pedido
+      </button>
+    </form>
+    <a href="/carrito" class="btn-outline" style="display:flex;justify-content:center;margin-top:.6rem">← Volver</a>
+  </div>
+</div>
+{% endblock %}
